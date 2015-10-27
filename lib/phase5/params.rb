@@ -11,8 +11,8 @@ module Phase5
     # passed in as a hash to `Params.new` as below:
     def initialize(req, route_params = {})
     @params = {}
+    @params = parse_www_encoded_form(req.query_string) unless req.query_string.nil?
     @route_params = route_params
-    parse_www_encoded_form(req.query_string) unless req.query_string.nil?
     end
 
 
@@ -37,9 +37,10 @@ module Phase5
       decoded_array = URI::decode_www_form(www_encoded_form)
       values = []
       paths = []
+      params = {}
 
       decoded_array.each do |(keypath, value)|
-        level = @params
+        level = params
         parsed_key = parse_key(keypath)
         parsed_key.each_with_index do |key, index|
 
@@ -51,7 +52,8 @@ module Phase5
           end
         end
       end
-      level
+
+      params
     end
 
 
